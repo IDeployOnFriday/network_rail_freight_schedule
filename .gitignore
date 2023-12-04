@@ -1,0 +1,5 @@
+.idea/*
+*.txt
+.vscode/*
+__pycache__/
+auth.py
