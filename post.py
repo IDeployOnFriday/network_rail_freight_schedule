@@ -1,4 +1,5 @@
 import json
+import zipfile, io
 
 import requests
 
@@ -17,11 +18,20 @@ def lib_request():
     print(departures.services)
 
 def get_freight_timetable():
-    res = requests.get(freight_url,  auth=HTTPBasicAuth(auth.feed_username, auth.feed_password))
+    r = requests.get(freight_url,  auth=HTTPBasicAuth(auth.feed_username, auth.feed_password))
+    z = zipfile.ZipFile(io.BytesIO(r.content))
+    z.extractall("/Users/aledphillips/PycharmProjects/trains_updates/tmp")
+
+def get_trains_at_station(station):
+    #  get info about station
+    res = requests.get('https://api.rtt.io/api/v1/json/search/{}'.format(station), auth=HTTPBasicAuth(auth.Username, auth.Password))
+    result = json.loads(res.content)
+    print(result)
+    return result
 
 def curl_request():
     #  get info about station
-    res = requests.get('https://api.rtt.io/api/v1/json/search/BGN', auth=HTTPBasicAuth(auth.Username, auth.Password))
+    res = requests.get('https://api.rtt.io/api/v1/json/search/BHM', auth=HTTPBasicAuth(auth.Username, auth.Password))
     result = json.loads(res.content)
     print(result)
 
