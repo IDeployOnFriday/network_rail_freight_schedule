@@ -1,8 +1,5 @@
 import json
 import zipfile, io
-
-import requests
-
 import requests
 
 from requests.auth import HTTPBasicAuth
@@ -12,6 +9,8 @@ from rttapi.api import RttApi
 
 freight_url = 'https://publicdatafeeds.networkrail.co.uk/ntrod/CifFileAuthenticate?type=CIF_FREIGHT_FULL_DAILY&day=toc-full'
 
+rtt_url='https://api.rtt.io/api/v1/json/search/'
+
 def lib_request():
     api = RttApi(auth.Username, auth.Password)
     departures = api.search_station_departures('CLJ')
@@ -19,8 +18,6 @@ def lib_request():
 
 def get_freight_timetable():
     r = requests.get(freight_url,  auth=HTTPBasicAuth(auth.feed_username, auth.feed_password))
-    z = zipfile.ZipFile(io.BytesIO(r.content))
-    z.extractall("/Users/aledphillips/PycharmProjects/trains_updates/tmp")
 
 def get_trains_at_station(station):
     #  get info about station
