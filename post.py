@@ -8,7 +8,7 @@ import auth
 from rttapi.api import RttApi
 
 freight_url = 'https://publicdatafeeds.networkrail.co.uk/ntrod/CifFileAuthenticate?type=CIF_FREIGHT_FULL_DAILY&day=toc-full'
-
+freight_url_CIF = 'https://publicdatafeeds.networkrail.co.uk/ntrod/CifFileAuthenticate?type=CIF_FREIGHT_FULL_DAILY&day=toc-full.CIF.gz'
 rtt_url='https://api.rtt.io/api/v1/json/search/'
 
 def lib_request():
