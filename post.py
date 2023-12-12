@@ -1,7 +1,9 @@
 import json
 import zipfile, io
 import requests
+from datetime import date
 
+import today
 from requests.auth import HTTPBasicAuth
 
 import auth
@@ -27,6 +29,7 @@ def get_trains_at_station(station):
     return result
 
 def curl_request():
+
     #  get info about station
     res = requests.get('https://api.rtt.io/api/v1/json/search/BHM', auth=HTTPBasicAuth(auth.Username, auth.Password))
     result = json.loads(res.content)
@@ -37,6 +40,18 @@ def curl_request():
     res = requests.get('https://api.rtt.io/api/v1/json/service/H31618/2023/12/07', auth=HTTPBasicAuth(auth.Username, auth.Password))
     result = json.loads(res.content)
     print(result)
+
+def get_service_info(service):
+    d1 = today.strftime("%d/%m/%Y")
+    day = today.strftime('%d')
+    month = today.strftime('%m')
+    year = today.strftime('%Y')
+
+    res = requests.get('https://api.rtt.io/api/v1/json/service/{}/{}/{}/{}'.format(service, year, month, day ),
+                       auth=HTTPBasicAuth(auth.Username, auth.Password))
+    result = json.loads(res.content)
+    print(result)
+
 
 if __name__ == '__main__':
     get_freight_timetable()
