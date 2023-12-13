@@ -1,9 +1,14 @@
+import gzip
 import json
+import os
+import shutil
+import subprocess
+import tarfile
 import zipfile, io
 import requests
 from datetime import date
 
-import today
+
 from requests.auth import HTTPBasicAuth
 
 import auth
@@ -19,7 +24,36 @@ def lib_request():
     print(departures.services)
 
 def get_freight_timetable():
-    r = requests.get(freight_url,  auth=HTTPBasicAuth(auth.feed_username, auth.feed_password))
+    # get the freight timetable using curl
+    curl_string = "curl -L -u '{}:{}' -o file.gz '{}'".format(auth.feed_username, auth.feed_password, freight_url)
+    process = subprocess.Popen(curl_string, shell=True, stdout=subprocess.PIPE)
+    process.wait()
+    print(process.returncode)
+
+    # extracting the .gz and write to text file
+    with gzip.open('file.gz', 'rb') as f_in:
+        with open('file.txt', 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+
+def read_file():
+    count = 0
+    uid = []
+    f = open("file.txt", "r")
+    for x in f:
+        if x.__contains__("CIF_train_uid"):
+            train_movement = json.loads(x)
+            uid.append(train_movement['JsonScheduleV1']['CIF_train_uid'])
+            count += 1
+
+    print(len(uid))
+    return uid
+
+def write_to_file(uid_list):
+    f = open("uid.txt", "a")
+    for item in uid_list:
+        f.write("%s\n" % item)
+    f.close()
+
 
 def get_trains_at_station(station):
     #  get info about station
@@ -28,30 +62,35 @@ def get_trains_at_station(station):
     print(result)
     return result
 
-def curl_request():
 
+def get_station_info():
     #  get info about station
     res = requests.get('https://api.rtt.io/api/v1/json/search/BHM', auth=HTTPBasicAuth(auth.Username, auth.Password))
     result = json.loads(res.content)
     print(result)
 
+def get_train_stops(service):
+
     # .....
     #  get info on specific service
-    res = requests.get('https://api.rtt.io/api/v1/json/service/H31618/2023/12/07', auth=HTTPBasicAuth(auth.Username, auth.Password))
+    res = requests.get('https://api.rtt.io/api/v1/json/service/{}/2023/12/13'.format(service), auth=HTTPBasicAuth(auth.Username, auth.Password))
     result = json.loads(res.content)
     print(result)
 
-def get_service_info(service):
-    d1 = today.strftime("%d/%m/%Y")
-    day = today.strftime('%d')
-    month = today.strftime('%m')
-    year = today.strftime('%Y')
-
-    res = requests.get('https://api.rtt.io/api/v1/json/service/{}/{}/{}/{}'.format(service, year, month, day ),
-                       auth=HTTPBasicAuth(auth.Username, auth.Password))
-    result = json.loads(res.content)
-    print(result)
+# def get_service_info(service):
+    # d1 = today.strftime("%d/%m/%Y")
+    # day = today.strftime('%d')
+    # month = today.strftime('%m')
+    # year = today.strftime('%Y')
+    #
+    # res = requests.get('https://api.rtt.io/api/v1/json/service/{}/{}/{}/{}'.format(service, year, month, day ),
+    #                    auth=HTTPBasicAuth(auth.Username, auth.Password))
+    # result = json.loads(res.content)
+    # print(result)
 
 
 if __name__ == '__main__':
-    get_freight_timetable()
+    # get_freight_timetable()
+    # uid_list = read_file()
+    # write_to_file(uid_list)
+    get_train_stops("C02569")
