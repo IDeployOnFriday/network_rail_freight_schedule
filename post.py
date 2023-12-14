@@ -3,8 +3,6 @@ import json
 import os
 import shutil
 import subprocess
-import tarfile
-import zipfile, io
 import requests
 from datetime import date
 
@@ -90,7 +88,7 @@ def get_train_stops(service):
 
 
 if __name__ == '__main__':
-    # get_freight_timetable()
-    # uid_list = read_file()
-    # write_to_file(uid_list)
+    get_freight_timetable()
+    uid_list = read_file()
+    write_to_file(uid_list)
     get_train_stops("C02569")
