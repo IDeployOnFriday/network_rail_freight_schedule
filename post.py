@@ -4,9 +4,8 @@ import os
 import shutil
 import subprocess
 import requests
-from datetime import date
-
-
+from datetime import date, datetime
+from preprocess import split_files
 from requests.auth import HTTPBasicAuth
 
 import auth
@@ -30,21 +29,36 @@ def get_freight_timetable():
 
     # extracting the .gz and write to text file
     with gzip.open('file.gz', 'rb') as f_in:
-        with open('file.txt', 'wb') as f_out:
+        with open('schedule.txt', 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
+
+def read_schedule():
+    count = 0
+    uid = []
+    f = open("tmp/JsonSchedule.txt", "r")
+    for x in f:
+        if x.__contains__("YORK"):
+            train_movement = json.loads(x)
+            uid.append(train_movement)
+            count += 1
+
+    print(len(uid))
+    return uid
 
 def read_file():
     count = 0
     uid = []
-    f = open("file.txt", "r")
+    f = open("tmp/JsonSchedule.txt", "r")
     for x in f:
-        if x.__contains__("CIF_train_uid"):
+        if x.__contains__("TiplocV1"):
             train_movement = json.loads(x)
             uid.append(train_movement['JsonScheduleV1']['CIF_train_uid'])
             count += 1
 
     print(len(uid))
     return uid
+
+
 
 def write_to_file(uid_list):
     f = open("uid.txt", "a")
@@ -75,20 +89,48 @@ def get_train_stops(service):
     result = json.loads(res.content)
     print(result)
 
-# def get_service_info(service):
-    # d1 = today.strftime("%d/%m/%Y")
-    # day = today.strftime('%d')
-    # month = today.strftime('%m')
-    # year = today.strftime('%Y')
-    #
-    # res = requests.get('https://api.rtt.io/api/v1/json/service/{}/{}/{}/{}'.format(service, year, month, day ),
-    #                    auth=HTTPBasicAuth(auth.Username, auth.Password))
-    # result = json.loads(res.content)
-    # print(result)
+def get_service_info(service):
+    today = datetime.today()
+    d1 = today.strftime("%d/%m/%Y")
+    day = today.strftime('%d')
+    month = today.strftime('%m')
+    year = today.strftime('%Y')
+    
+    res = requests.get('https://api.rtt.io/api/v1/json/service/{}/{}/{}/{}'.format(service, year, month, day ),
+                       auth=HTTPBasicAuth(auth.Username, auth.Password))
+    result = json.loads(res.content)
+    print(result)
+
+def get_trains_passing_today(trains_passing):
+    today_trains = []
+    today_dateNumber = datetime.today().weekday()
+    for train in trains_passing:
+        uid = train['JsonScheduleV1']['CIF_train_uid']
+        days_running = train['JsonScheduleV1']['schedule_days_runs']
+        schedule_end_date = train['JsonScheduleV1']['schedule_end_date']
+        schedule_start_date = train['JsonScheduleV1']['schedule_start_date']
+        if days_running[today_dateNumber] == '1':
+            today_trains.append(train)
+            print('running: {}'.format(uid))
+        else:
+            print('not running: {}'.format(uid))
+        get_service_info(uid)
+
+    print(len(today_trains))
+    return today_trains
+
+
+
 
 
 if __name__ == '__main__':
     get_freight_timetable()
-    uid_list = read_file()
-    write_to_file(uid_list)
-    get_train_stops("C02569")
+    split_files()
+    trains_passing = read_schedule()
+    trains_passing_today = get_trains_passing_today(trains_passing)
+
+    # print('.................')
+    # for train in trains_passing:
+    #     uid = train['JsonScheduleV1']['CIF_train_uid']
+    #     get_service_info(uid)
+
