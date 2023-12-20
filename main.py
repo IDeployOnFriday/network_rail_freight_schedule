@@ -7,14 +7,14 @@ from preprocess_files import split_files
 '''
 station options for testing 
 YORK 
-BGN
+BRGEND
 '''
 
 
 if __name__ == '__main__':
     # get_freight_timetable()
     # split_files()
-    trains_passing = read_schedule('BGN')
+    trains_passing = read_schedule('BRGEND')
     (running_trains, not_running_trains) = get_trains_passing_today(trains_passing)
 
     print('Number of trains running {} '.format(len(running_trains)))
