@@ -12,8 +12,8 @@ BRGEND
 
 
 if __name__ == '__main__':
-    get_freight_timetable()
-    split_files()
+    # get_freight_timetable()
+    # split_files()
     trains_passing = read_schedule('BRGEND')
     (running_trains, not_running_trains) = get_trains_passing_today(trains_passing)
 
