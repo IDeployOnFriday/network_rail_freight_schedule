@@ -4,6 +4,7 @@ from dates import is_date_between
 
 
 def get_timetable(trains_passing):
+    print('total scehdule trains to pass {} '.format(len(trains_passing)))
     ordered_trains = []
     for train in trains_passing:
         uid = train['JsonScheduleV1']['CIF_train_uid']
@@ -16,8 +17,8 @@ def get_timetable(trains_passing):
             if place == 'BRGEND':
                 try:
                     time = re.sub("[^0-9]", "", stop['pass'])
-                    print('{} Passing {} : {}'.format(uid, place, time))
-                    my_date='2023-12-22'
+                    #print('{} Passing {} : {}'.format(uid, place, time))
+                    my_date='2023-12-23'
                     if is_date_between(schedule_start_date, schedule_end_date,my_date):
                         ordered_trains.append([uid, place, time,schedule_start_date,schedule_end_date])
                 except:
@@ -25,4 +26,5 @@ def get_timetable(trains_passing):
 
     sorted_by_second = sorted(ordered_trains, key=lambda tup: tup[2])
     for t in sorted_by_second:
-        print(t)
+         print(t)
+    print('total scehdule trains to schedules today {} ', len(ordered_trains))
