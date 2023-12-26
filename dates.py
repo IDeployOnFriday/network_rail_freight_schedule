@@ -1,6 +1,4 @@
 from datetime import datetime
-
-
 def is_date_between(start_date, end_date, my_date):
 
     s_date = datetime.strptime(start_date, '%Y-%m-%d')

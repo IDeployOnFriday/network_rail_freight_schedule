@@ -1,9 +1,13 @@
 import re
+from datetime import datetime
 
 from dates import is_date_between
 
 
-def get_timetable(trains_passing):
+def get_timetable(trains_passing, station):
+    d1 = datetime.today()
+    today = d1.strftime("%Y-%m-%d")
+    print('today' + today)
     print('total scehdule trains to pass {} '.format(len(trains_passing)))
     ordered_trains = []
     for train in trains_passing:
@@ -14,16 +18,26 @@ def get_timetable(trains_passing):
         schedule_locations = train['JsonScheduleV1']['schedule_segment']['schedule_location']
         for stop in schedule_locations:
             place = stop['tiploc_code']
-            if place == 'BRGEND':
+            if place == station:
+                print(uid)
                 try:
-                    time = re.sub("[^0-9]", "", stop['pass'])
-                    #print('{} Passing {} : {}'.format(uid, place, time))
-                    my_date='2023-12-23'
-                    if is_date_between(schedule_start_date, schedule_end_date,my_date):
-                        ordered_trains.append([uid, place, time,schedule_start_date,schedule_end_date])
+                    if stop['pass'] != None:
+                        time = re.sub("[^0-9]", "", stop['pass'])
+                        #print('{} Passing {} : {}'.format(uid, place, time))
+                        my_date='2023-12-23'
+                        if is_date_between(schedule_start_date, schedule_end_date,my_date):
+                            ordered_trains.append([uid, place, time,schedule_start_date,schedule_end_date])
                 except:
                     print("An exception occurred")
-
+                try:
+                    if stop['arrival'] != None:
+                        time = re.sub("[^0-9]", "", stop['arrival'])
+                        # print('{} Passing {} : {}'.format(uid, place, time))
+                        my_date = '2023-12-23'
+                        if is_date_between(schedule_start_date, schedule_end_date, my_date):
+                            ordered_trains.append([uid, place, time, schedule_start_date, schedule_end_date])
+                except:
+                    print("An exception occurred")
     sorted_by_second = sorted(ordered_trains, key=lambda tup: tup[2])
     for t in sorted_by_second:
          print(t)

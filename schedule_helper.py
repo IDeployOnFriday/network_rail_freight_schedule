@@ -4,20 +4,19 @@ import shutil
 import subprocess
 from datetime import datetime
 from pathlib import Path
-
 import auth
-
-freight_url = 'https://publicdatafeeds.networkrail.co.uk/ntrod/CifFileAuthenticate?type=CIF_FREIGHT_FULL_DAILY&day=toc-full'
+import config
+import os
 
 
 def is_new_timeTable():
 
-    my_file = Path("schedule.txt")
+    my_file = Path(config.workingDir +'/schedule.txt')
     # return true if no schedule exists locally
     if not my_file.is_file():
         return True
     else:
-        with open('schedule.txt') as f:
+        with open(config.workingDir +'/schedule.txt') as f:
             first_line = f.readline().strip('\n')
             schedule_meta_data = json.loads(first_line)
             timestamp = schedule_meta_data['JsonTimetableV1']['timestamp']
@@ -35,20 +34,20 @@ def is_new_timeTable():
 
 def get_freight_timetable():
     # get the freight timetable using curl
-    curl_string = "curl -L -u '{}:{}' -o file.gz '{}'".format(auth.feed_username, auth.feed_password, freight_url)
+    curl_string = "curl -L -u '{}:{}' -o file.gz '{}'".format(auth.feed_username, auth.feed_password, config.freight_url)
     process = subprocess.Popen(curl_string, shell=True, stdout=subprocess.PIPE)
     process.wait()
     print(process.returncode)
 
     # extracting the .gz and write to text file
     with gzip.open('file.gz', 'rb') as f_in:
-        with open('schedule.txt', 'wb') as f_out:
+        with open('workingDir/schedule.txt', 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
 
 def read_schedule(station):
     count = 0
     uid = []
-    f = open("tmp/JsonSchedule.txt", "r")
+    f = open(config.workingDir +"/JsonSchedule.txt", "r")
     for x in f:
         if x.__contains__(station):
             train_movement = json.loads(x)
@@ -57,3 +56,16 @@ def read_schedule(station):
 
     print(len(uid))
     return uid
+
+def clean_up():
+    if os.path.exists(config.workingDir + '/' + config.JsonAssociation):
+        os.remove(config.workingDir + '/' + config.JsonAssociation)
+
+    if os.path.exists(config.workingDir + '/' + config.JsonSchedule):
+        os.remove(config.workingDir + '/' + config.JsonSchedule)
+
+    if os.path.exists(config.workingDir + '/' + config.schedule):
+        os.remove(config.workingDir + '/' + config.schedule)
+
+    if os.path.exists(config.workingDir + '/' + config.tiploc):
+        os.remove(config.workingDir + '/' + config.tiploc)

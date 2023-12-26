@@ -1,14 +1,16 @@
+import config
+
 def split_files():
     count = 0
     uid = []
     f = open("schedule.txt", "r")
     for line in f:
         if line.__contains__("TiplocV1"):
-            write_to_file("tmp/tiploc.txt", line)
+            write_to_file(config.workingDir +"/tiploc.txt", line)
         elif line.__contains__("JsonAssociationV1"):
-            write_to_file("tmp/JsonAssociation.txt", line)
+            write_to_file(config.workingDir +"/JsonAssociation.txt", line)
         elif line.__contains__("JsonScheduleV1"):
-            write_to_file("tmp/JsonSchedule.txt", line)
+            write_to_file(config.workingDir +"/JsonSchedule.txt", line)
         else:
             count +=1
 
