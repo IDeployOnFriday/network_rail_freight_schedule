@@ -3,32 +3,34 @@ import json
 import shutil
 import subprocess
 from datetime import datetime
+from pathlib import Path
 
 import auth
 
 freight_url = 'https://publicdatafeeds.networkrail.co.uk/ntrod/CifFileAuthenticate?type=CIF_FREIGHT_FULL_DAILY&day=toc-full'
 
 
-def is_new_timeTable(): 
-     
-    with open('schedule.txt') as f:
-        first_line = f.readline().strip('\n')
-        schedule_meta_data = json.loads(first_line)
-        timestamp = schedule_meta_data['JsonTimetableV1']['timestamp']
-        dt_object = datetime.fromtimestamp(timestamp)
+def is_new_timeTable():
 
-        today = datetime.today()
-        d1 = today.strftime("%d/%m/%Y")
-        d2 = dt_object.strftime("%d/%m/%Y")
-        print(d1, d2)
-        if d1 == d2:
-            return False
-        else:
+    my_file = Path("schedule.txt")
+    # return true if no schedule exists locally
+    if not my_file.is_file():
+        return True
+    else:
+        with open('schedule.txt') as f:
+            first_line = f.readline().strip('\n')
+            schedule_meta_data = json.loads(first_line)
+            timestamp = schedule_meta_data['JsonTimetableV1']['timestamp']
+            dt_object = datetime.fromtimestamp(timestamp)
+
+            today = datetime.today()
+            d1 = today.strftime("%d/%m/%Y")
+            d2 = dt_object.strftime("%d/%m/%Y")
+            print(d1, d2)
+        if d1 != d2:
             return True
-
-
-
-
+        else:
+            return False
 
 
 def get_freight_timetable():
