@@ -1,7 +1,7 @@
 import config
 from format_output import get_timetable
 from get_station_timetable import get_trains_passing_today
-from schedule_helper import get_freight_timetable, is_new_timeTable, read_schedule
+from schedule_helper import get_freight_timetable, is_new_timeTable, read_schedule, clean_up
 from preprocess_files import split_files
 
 
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     print("getting freight schedule for : " + config.station + " station")
 
     if is_new_timeTable():
-        clear_up()
+        clean_up()
         get_freight_timetable()
         split_files()
 

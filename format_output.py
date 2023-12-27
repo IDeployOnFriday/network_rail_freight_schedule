@@ -14,30 +14,22 @@ def get_timetable(trains_passing, station):
         uid = train['JsonScheduleV1']['CIF_train_uid']
         schedule_end_date = train['JsonScheduleV1']['schedule_end_date']
         schedule_start_date = train['JsonScheduleV1']['schedule_start_date']
-
         schedule_locations = train['JsonScheduleV1']['schedule_segment']['schedule_location']
+
         for stop in schedule_locations:
             place = stop['tiploc_code']
             if place == station:
-                print(uid)
-                try:
-                    if stop['pass'] != None:
+
+                if 'pass' in stop and stop['pass'] is not None:
                         time = re.sub("[^0-9]", "", stop['pass'])
-                        #print('{} Passing {} : {}'.format(uid, place, time))
-                        my_date='2023-12-23'
-                        if is_date_between(schedule_start_date, schedule_end_date,my_date):
+                        if is_date_between(schedule_start_date, schedule_end_date,today):
                             ordered_trains.append([uid, place, time,schedule_start_date,schedule_end_date])
-                except:
-                    print("An exception occurred")
-                try:
-                    if stop['arrival'] != None:
-                        time = re.sub("[^0-9]", "", stop['arrival'])
-                        # print('{} Passing {} : {}'.format(uid, place, time))
-                        my_date = '2023-12-23'
-                        if is_date_between(schedule_start_date, schedule_end_date, my_date):
-                            ordered_trains.append([uid, place, time, schedule_start_date, schedule_end_date])
-                except:
-                    print("An exception occurred")
+
+                if 'arrival' in stop and stop['arrival'] is not None:
+                    time = re.sub("[^0-9]", "", stop['arrival'])
+                    if is_date_between(schedule_start_date, schedule_end_date, today):
+                        ordered_trains.append([uid, place, time, schedule_start_date, schedule_end_date])
+
     sorted_by_second = sorted(ordered_trains, key=lambda tup: tup[2])
     for t in sorted_by_second:
          print(t)
